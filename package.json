@@ -1,0 +1,44 @@
+{
+  "name": "@ilmtest/extendo",
+  "version": "0.1.0",
+  "displayName": "Extendo",
+  "author": "IlmTest",
+  "description": "A browser extension to easily interact with the IlmTest platform.",
+  "scripts": {
+    "build": "vite build",
+    "watch": "vite build --watch --mode development --minify false",
+    "dev": "vite",
+    "serve:firefox": "web-ext run --start-url \"about:debugging#/runtime/this-firefox\"  --source-dir ./dist/",
+    "serve:chrome": "web-ext run -t chromium --start-url \"https://example.com\" --source-dir ./dist/"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@samrum/vite-plugin-web-extension": "^5.0.0",
+    "@types/chrome": "^0.0.228",
+    "@types/webextension-polyfill": "^0.10.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "@vitejs/plugin-react-swc": "^3.3.2",
+    "eslint": "^8.49.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-plugin-sort-destructure-keys": "^1.5.0",
+    "eslint-plugin-sort-keys-fix": "^1.1.2",
+    "prettier": "^3.0.3",
+    "vite": "~4.3.3",
+    "vite-plugin-eslint": "^1.8.1",
+    "web-ext": "^7.6.2"
+  },
+  "dependencies": {
+    "axios": "^1.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "webextension-polyfill": "^0.10.0"
+  }
+}
