@@ -30,6 +30,7 @@ const sanitizeURL = (url) => {
 
 const App = () => {
     const [entries, setEntries] = useState([]);
+    const [url, setUrl] = useState('');
 
     useEffect(() => {
         getValue(ENTRY_LOOKUP_RESULTS_KEY).then((values) => {
@@ -38,14 +39,20 @@ const App = () => {
                 removeValue(ENTRY_LOOKUP_RESULTS_KEY);
             }
         });
+
+        getCurrentTab().then((tab) => {
+            if (tab?.url) {
+                setUrl(sanitizeURL(tab.url));
+            }
+        });
     }, []);
 
     const lookupCurrentTabURL = async () => {
         const tab = await getCurrentTab();
 
         if (tab?.url) {
-            const url = sanitizeURL(tab.url);
             log('getEntries::url', url);
+            browser.action.setBadgeText({ text: '…' });
             const data = await getEntries({ url });
 
             browser.action.setBadgeText({ text: data.length.toString() });
@@ -58,7 +65,7 @@ const App = () => {
         <main>
             <div>
                 <button onClick={lookupCurrentTabURL} type="button">
-                    Query URL
+                    Query {url || 'URL'}
                 </button>
                 {entries && (
                     <ul>

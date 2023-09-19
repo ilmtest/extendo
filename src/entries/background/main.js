@@ -8,6 +8,7 @@ import { saveValue } from '../../utils/state';
 const EXTENSION_ID = 'ilmtest_entry_lookup';
 
 const performTextLookup = async (selectedText) => {
+    browser.action.setBadgeText({ text: '…' });
     const entries = await getEntries({ query: JSON.stringify([selectedText]) });
 
     browser.action.setBadgeText({ text: entries.length.toString() });
