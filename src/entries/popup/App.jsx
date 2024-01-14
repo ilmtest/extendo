@@ -64,9 +64,25 @@ const App = () => {
     return (
         <main>
             <div>
+                <textarea onChange={(e) => setUrl(e.target.value)} rows="5" style={{ width: '100%' }} value={url} />
                 <button onClick={lookupCurrentTabURL} type="button">
-                    Query {url || 'URL'}
+                    Query
                 </button>
+                {url.includes('%') && (
+                    <button onClick={() => setUrl(decodeURIComponent(url))} type="button">
+                        Decode
+                    </button>
+                )}
+                {(url.startsWith('http') || url.startsWith('www')) && (
+                    <button
+                        onClick={() => {
+                            setUrl(url.replace(/(https?:\/\/)?(www\.)?/, ''));
+                        }}
+                        type="button"
+                    >
+                        Remove Protocol
+                    </button>
+                )}
                 {entries && (
                     <ul>
                         {entries.map(({ body, id }) => {
