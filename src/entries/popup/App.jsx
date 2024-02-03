@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import browser from 'webextension-polyfill';
 
 import { getEntries } from '../../api';
-import { ENTRY_LOOKUP_RESULTS_KEY } from '../../utils/constants';
+import { ENTRY_LOOKUP_RESULTS_KEY, OCR_RESULTS_KEY } from '../../utils/constants';
 import { log } from '../../utils/logger';
 import { getValue, removeValue } from '../../utils/state';
 
@@ -40,9 +40,16 @@ const App = () => {
             }
         });
 
+        getValue(OCR_RESULTS_KEY).then((result) => {
+            if (result.text) {
+                setUrl(result.text);
+                removeValue(OCR_RESULTS_KEY);
+            }
+        });
+
         getCurrentTab().then((tab) => {
             if (tab?.url) {
-                setUrl(sanitizeURL(tab.url));
+                // setUrl(sanitizeURL(tab.url));
             }
         });
     }, []);
