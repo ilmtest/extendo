@@ -2,11 +2,8 @@ import browser from 'webextension-polyfill';
 
 import { getEntries, ocr } from '../../api';
 import { ENTRY_LOOKUP_RESULTS_KEY, OCR_RESULTS_KEY } from '../../utils/constants';
-import { log, logError } from '../../utils/logger';
+import { log } from '../../utils/logger';
 import { saveValue } from '../../utils/state';
-
-const EXTENSION_ID = 'ilmtest_entry_lookup';
-const OCR_EXTENSION_ID = 'ilmtest_ocr';
 
 const performTextLookup = async (selectedText) => {
     browser.action.setBadgeText({ text: '…' });
@@ -26,9 +23,10 @@ const performOCR = async (link) => {
 
     if (text) {
         await saveValue(OCR_RESULTS_KEY, { text });
+        browser.action.setBadgeText({ text: '1' });
+    } else {
+        browser.action.setBadgeText({ text: '' });
     }
-
-    browser.action.setBadgeText({ text: '' });
 };
 
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
@@ -48,21 +46,21 @@ browser.runtime.onInstalled.addListener((details) => {
 
     browser.contextMenus.create({
         contexts: ['selection'],
-        id: EXTENSION_ID,
+        id: ENTRY_LOOKUP_RESULTS_KEY,
         title: 'Query Entries',
     });
 
     browser.contextMenus.create({
         contexts: ['image'],
-        id: OCR_EXTENSION_ID,
+        id: OCR_RESULTS_KEY,
         title: 'OCR',
     });
 });
 
 browser.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === EXTENSION_ID) {
+    if (info.menuItemId === ENTRY_LOOKUP_RESULTS_KEY) {
         performTextLookup(info.selectionText);
-    } else if (info.menuItemId === OCR_EXTENSION_ID) {
+    } else if (info.menuItemId === OCR_RESULTS_KEY) {
         performOCR(info.srcUrl, tab);
     }
 });

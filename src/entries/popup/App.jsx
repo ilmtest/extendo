@@ -4,7 +4,7 @@ import browser from 'webextension-polyfill';
 import { getEntries } from '../../api';
 import { ENTRY_LOOKUP_RESULTS_KEY, OCR_RESULTS_KEY } from '../../utils/constants';
 import { log } from '../../utils/logger';
-import { getValue, removeValue } from '../../utils/state';
+import { removeValue } from '../../utils/state';
 
 import './App.css';
 
@@ -31,25 +31,23 @@ const sanitizeURL = (url) => {
 const App = () => {
     const [entries, setEntries] = useState([]);
     const [url, setUrl] = useState('');
+    const [isRTL, setIsRTL] = useState(false);
 
     useEffect(() => {
-        getValue(ENTRY_LOOKUP_RESULTS_KEY).then((values) => {
-            if (values?.length > 0) {
-                setEntries(values);
+        browser.storage.local.get([ENTRY_LOOKUP_RESULTS_KEY, OCR_RESULTS_KEY]).then((records) => {
+            if (records[ENTRY_LOOKUP_RESULTS_KEY]?.length > 0) {
+                setEntries(records[ENTRY_LOOKUP_RESULTS_KEY]);
                 removeValue(ENTRY_LOOKUP_RESULTS_KEY);
-            }
-        });
-
-        getValue(OCR_RESULTS_KEY).then((result) => {
-            if (result.text) {
-                setUrl(result.text);
+            } else if (records[OCR_RESULTS_KEY]?.text) {
+                setUrl(records[OCR_RESULTS_KEY].text);
+                setIsRTL(true);
                 removeValue(OCR_RESULTS_KEY);
-            }
-        });
-
-        getCurrentTab().then((tab) => {
-            if (tab?.url) {
-                // setUrl(sanitizeURL(tab.url));
+            } else {
+                getCurrentTab().then((tab) => {
+                    if (tab?.url) {
+                        setUrl(sanitizeURL(tab.url));
+                    }
+                });
             }
         });
     }, []);
@@ -71,7 +69,13 @@ const App = () => {
     return (
         <main>
             <div>
-                <textarea onChange={(e) => setUrl(e.target.value)} rows="5" style={{ width: '100%' }} value={url} />
+                <textarea
+                    dir={isRTL ? 'rtl' : undefined}
+                    onChange={(e) => setUrl(e.target.value)}
+                    rows="5"
+                    style={{ width: '100%' }}
+                    value={url}
+                />
                 <button onClick={lookupCurrentTabURL} type="button">
                     Query
                 </button>
@@ -95,7 +99,7 @@ const App = () => {
                         {entries.map(({ body, id }) => {
                             return (
                                 <li key={`entry-${id}`}>
-                                    <a href={`${ENTRY_URL_PREFIX}/${id}`} rel="noreferrer" target="_blank">
+                                    <a href={`${ENTRY_URL_PREFIX}/${id}`} rel="noreferrer" target="_blank" title={body}>
                                         [{id}]: {body ? truncate(body) : '?'}
                                     </a>
                                 </li>

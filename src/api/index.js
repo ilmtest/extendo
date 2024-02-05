@@ -15,7 +15,6 @@ export const ocr = async (host, imageUrl) => {
     search.append('url', imageUrl);
 
     url.search = search;
-    console.log('url', url.toString());
 
     const response = await fetch(url, { method: 'GET' });
     return response.json();
