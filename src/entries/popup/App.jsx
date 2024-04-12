@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import browser from 'webextension-polyfill';
 
 import { getEntries } from '../../api';
-import { ENTRY_LOOKUP_RESULTS_KEY, OCR_RESULTS_KEY } from '../../utils/constants';
+import { popEntryResults } from '../../utils/db';
 import { log } from '../../utils/logger';
-import { removeValue } from '../../utils/state';
 
 import './App.css';
 
@@ -31,52 +30,32 @@ const sanitizeURL = (url) => {
 const App = () => {
     const [entries, setEntries] = useState([]);
     const [url, setUrl] = useState('');
-    const [isRTL, setIsRTL] = useState(false);
-
-    useEffect(() => {
-        browser.storage.local.get([ENTRY_LOOKUP_RESULTS_KEY, OCR_RESULTS_KEY]).then((records) => {
-            if (records[ENTRY_LOOKUP_RESULTS_KEY]?.length > 0) {
-                setEntries(records[ENTRY_LOOKUP_RESULTS_KEY]);
-                removeValue(ENTRY_LOOKUP_RESULTS_KEY);
-            } else if (records[OCR_RESULTS_KEY]?.text) {
-                setUrl(records[OCR_RESULTS_KEY].text);
-                setIsRTL(true);
-                removeValue(OCR_RESULTS_KEY);
-            } else {
-                getCurrentTab().then((tab) => {
-                    if (tab?.url) {
-                        setUrl(sanitizeURL(tab.url));
-                    }
-                });
-            }
-        });
-    }, []);
 
     const lookupCurrentTabURL = async () => {
-        const tab = await getCurrentTab();
+        log('getEntries::url', url);
+        browser.action.setBadgeText({ text: '…' });
+        const data = await getEntries({ url });
 
-        if (tab?.url) {
-            log('getEntries::url', url);
-            browser.action.setBadgeText({ text: '…' });
-            const data = await getEntries({ url });
-
-            browser.action.setBadgeText({ text: data.length.toString() });
-            browser.action.setBadgeBackgroundColor({ color: '#777777' });
-            setEntries(data);
-        }
+        browser.action.setBadgeText({ text: data.length.toString() });
+        browser.action.setBadgeBackgroundColor({ color: '#777777' });
+        setEntries(data);
     };
+
+    useEffect(() => {
+        getCurrentTab().then((tab) => {
+            const tabUrl = tab.url ? sanitizeURL(tab.url) : '';
+
+            setUrl(tabUrl.endsWith('/') ? tabUrl.slice(0, -1) : tabUrl);
+        });
+
+        popEntryResults().then(setEntries);
+    }, []);
 
     return (
         <main>
             <div>
-                <textarea
-                    dir={isRTL ? 'rtl' : undefined}
-                    onChange={(e) => setUrl(e.target.value)}
-                    rows="5"
-                    style={{ width: '100%' }}
-                    value={url}
-                />
-                <button onClick={lookupCurrentTabURL} type="button">
+                <textarea onChange={(e) => setUrl(e.target.value)} rows="5" style={{ width: '100%' }} value={url} />
+                <button disabled={!url} onClick={lookupCurrentTabURL} type="button">
                     Query
                 </button>
                 {url.includes('%') && (

@@ -1,9 +1,10 @@
 import browser from 'webextension-polyfill';
 
-import { getEntries, ocr } from '../../api';
-import { ENTRY_LOOKUP_RESULTS_KEY, OCR_RESULTS_KEY } from '../../utils/constants';
+import { getEntries } from '../../api';
+import { saveEntryResults } from '../../utils/db';
 import { log } from '../../utils/logger';
-import { saveValue } from '../../utils/state';
+
+const ENTRY_LOOKUP_RESULTS_KEY = 'entry_lookup_results';
 
 const performTextLookup = async (selectedText) => {
     browser.action.setBadgeText({ text: '…' });
@@ -12,20 +13,7 @@ const performTextLookup = async (selectedText) => {
     browser.action.setBadgeText({ text: entries.length.toString() });
 
     if (entries.length) {
-        await saveValue(ENTRY_LOOKUP_RESULTS_KEY, entries);
-    }
-};
-
-const performOCR = async (link) => {
-    browser.action.setBadgeText({ text: '…' });
-    const result = await ocr(import.meta.env.VITE_API_OCR_SPACE_URL, link);
-    const text = result.ParsedResults?.length > 0 && result.ParsedResults[0].ParsedText;
-
-    if (text) {
-        await saveValue(OCR_RESULTS_KEY, { text });
-        browser.action.setBadgeText({ text: '1' });
-    } else {
-        browser.action.setBadgeText({ text: '' });
+        await saveEntryResults(entries);
     }
 };
 
@@ -49,18 +37,10 @@ browser.runtime.onInstalled.addListener((details) => {
         id: ENTRY_LOOKUP_RESULTS_KEY,
         title: 'Query Entries',
     });
-
-    browser.contextMenus.create({
-        contexts: ['image'],
-        id: OCR_RESULTS_KEY,
-        title: 'OCR',
-    });
 });
 
-browser.contextMenus.onClicked.addListener((info, tab) => {
+browser.contextMenus.onClicked.addListener((info) => {
     if (info.menuItemId === ENTRY_LOOKUP_RESULTS_KEY) {
         performTextLookup(info.selectionText);
-    } else if (info.menuItemId === OCR_RESULTS_KEY) {
-        performOCR(info.srcUrl, tab);
     }
 });
