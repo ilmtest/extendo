@@ -3,6 +3,8 @@ import browser from 'webextension-polyfill';
 import { logError } from './logger';
 
 const ENTRY_RESULTS_KEY = 'entry_results';
+const URL_QUERY_ENDPOINT_KEY = 'url_query_endpoint';
+const CONTENT_QUERY_ENDPOINT_KEY = 'content_query_endpoint';
 
 const saveValue = async (key, value) => {
     try {
@@ -34,4 +36,22 @@ export const popEntryResults = async () => {
 
 export const saveEntryResults = async (value) => {
     return saveValue(ENTRY_RESULTS_KEY, value);
+};
+
+export const getUrlQueryEndpoint = async () => {
+    const result = await getValue(URL_QUERY_ENDPOINT_KEY);
+    return result || '';
+};
+
+export const saveUrlQueryEndpoint = async (value) => {
+    return saveValue(URL_QUERY_ENDPOINT_KEY, value);
+};
+
+export const getContentQueryEndpoint = async () => {
+    const result = await getValue(CONTENT_QUERY_ENDPOINT_KEY);
+    return result || '';
+};
+
+export const saveContentQueryEndpoint = async (value) => {
+    return saveValue(CONTENT_QUERY_ENDPOINT_KEY, value);
 };

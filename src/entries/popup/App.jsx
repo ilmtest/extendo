@@ -1,15 +1,11 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import browser from 'webextension-polyfill';
 
-import { getEntries } from '../../api';
-import { popEntryResults } from '../../utils/db';
+import { doGetRequest } from '~/api';
+
+import { getUrlQueryEndpoint, popEntryResults } from '../../utils/db';
 import { log } from '../../utils/logger';
-
 import './App.css';
-
-const ENTRY_URL_PREFIX = import.meta.env.VITE_API_ENTRY_URL;
-
-const truncate = (val, n = 150) => (val.length > n ? `${val.substr(0, n - 1)}…` : val);
 
 const getCurrentTab = async () => {
     const [tab] = await browser.tabs.query({ active: true, lastFocusedWindow: true });
@@ -24,6 +20,10 @@ const sanitizeURL = (url) => {
         cleanedURL += parsedUrl.search;
     }
 
+    if (cleanedURL.endsWith('/')) {
+        cleanedURL = cleanedURL.slice(0, -1);
+    }
+
     return cleanedURL;
 };
 
@@ -32,9 +32,13 @@ const App = () => {
     const [url, setUrl] = useState('');
 
     const lookupCurrentTabURL = async () => {
-        log('getEntries::url', url);
+        const endpoint = await getUrlQueryEndpoint();
+        const urlWithQueryParams = endpoint.replace('{{url}}', encodeURIComponent(url));
+
+        log('doGetRequest::url', urlWithQueryParams);
         browser.action.setBadgeText({ text: '…' });
-        const data = await getEntries({ url });
+
+        const data = await doGetRequest(urlWithQueryParams);
 
         browser.action.setBadgeText({ text: data.length.toString() });
         browser.action.setBadgeBackgroundColor({ color: '#777777' });
@@ -44,8 +48,7 @@ const App = () => {
     useEffect(() => {
         getCurrentTab().then((tab) => {
             const tabUrl = tab.url ? sanitizeURL(tab.url) : '';
-
-            setUrl(tabUrl.endsWith('/') ? tabUrl.slice(0, -1) : tabUrl);
+            setUrl(tabUrl);
         });
 
         popEntryResults().then(setEntries);
@@ -53,40 +56,41 @@ const App = () => {
 
     return (
         <main>
-            <div>
-                <textarea onChange={(e) => setUrl(e.target.value)} rows="5" style={{ width: '100%' }} value={url} />
-                <button disabled={!url} onClick={lookupCurrentTabURL} type="button">
-                    Query
-                </button>
-                {url.includes('%') && (
-                    <button onClick={() => setUrl(decodeURIComponent(url))} type="button">
-                        Decode
+            <div className="input-container">
+                <textarea className="input-textarea" onChange={(e) => setUrl(e.target.value)} rows="5" value={url} />
+                <div className="button-container">
+                    <button className="button" disabled={!url} onClick={lookupCurrentTabURL} type="button">
+                        Query URL
                     </button>
-                )}
-                {(url.startsWith('http') || url.startsWith('www')) && (
-                    <button
-                        onClick={() => {
-                            setUrl(url.replace(/(https?:\/\/)?(www\.)?/, ''));
-                        }}
-                        type="button"
-                    >
-                        Remove Protocol
-                    </button>
-                )}
-                {entries && (
-                    <ul>
-                        {entries.map(({ body, id }) => {
-                            return (
-                                <li key={`entry-${id}`}>
-                                    <a href={`${ENTRY_URL_PREFIX}/${id}`} rel="noreferrer" target="_blank" title={body}>
-                                        [{id}]: {body ? truncate(body) : '?'}
-                                    </a>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                )}
+                    {url.includes('%') && (
+                        <button className="button" onClick={() => setUrl(decodeURIComponent(url))} type="button">
+                            Decode
+                        </button>
+                    )}
+                    {(url.startsWith('http') || url.startsWith('www')) && (
+                        <button
+                            className="button"
+                            onClick={() => {
+                                setUrl(url.replace(/(https?:\/\/)?(www\.)?/, ''));
+                            }}
+                            type="button"
+                        >
+                            Remove Protocol
+                        </button>
+                    )}
+                </div>
             </div>
+            {entries && (
+                <ul className="entry-list">
+                    {entries.map((e, i) => {
+                        return (
+                            <li className="entry-item" key={`entry-${e.id || i}`}>
+                                {JSON.stringify(e)}
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
         </main>
     );
 };

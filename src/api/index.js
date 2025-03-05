@@ -1,9 +1,19 @@
-export const getEntries = async (queryParams) => {
-    const url = new URL(`${import.meta.env.VITE_API_HOST}/entries.php`);
+import { log } from '../utils/logger';
 
-    if (queryParams) {
-        url.search = new URLSearchParams(queryParams).toString();
+export const doGetRequest = async (host, queries = {}) => {
+    const url = new URL(host);
+
+    if (Object.keys(queries).length > 0) {
+        const search = new URLSearchParams(url.search);
+
+        Object.entries(queries).forEach(([key, value]) => {
+            search.append(key, value);
+        });
+
+        url.search = search;
     }
+
+    log('Requesting', url);
 
     const response = await fetch(url, { method: 'GET' });
     return response.json();

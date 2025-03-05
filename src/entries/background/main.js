@@ -1,19 +1,29 @@
 import browser from 'webextension-polyfill';
 
-import { getEntries } from '../../api';
-import { saveEntryResults } from '../../utils/db';
+import { doGetRequest } from '~/api';
+
+import { getContentQueryEndpoint, saveEntryResults } from '../../utils/db';
 import { log } from '../../utils/logger';
 
-const ENTRY_LOOKUP_RESULTS_KEY = 'entry_lookup_results';
+const QUERY_LOOKUP_RESULTS_KEY = 'query_lookup_results';
 
 const performTextLookup = async (selectedText) => {
     browser.action.setBadgeText({ text: '…' });
-    const entries = await getEntries({ query: JSON.stringify([selectedText]) });
 
-    browser.action.setBadgeText({ text: entries.length.toString() });
+    const endpoint = await getContentQueryEndpoint();
+    const urlWithQueryParams = endpoint
+        .replace('{{text}}', encodeURIComponent(selectedText))
+        .replace('{{string_array}}', JSON.stringify([selectedText]));
+    const results = (await doGetRequest(urlWithQueryParams)).map((r) => ({
+        [`${QUERY_LOOKUP_RESULTS_KEY}_timestamp`]: new Date().toLocaleTimeString(),
+        [QUERY_LOOKUP_RESULTS_KEY]: selectedText,
+        ...r,
+    }));
 
-    if (entries.length) {
-        await saveEntryResults(entries);
+    browser.action.setBadgeText({ text: results.length.toString() });
+
+    if (results.length) {
+        await saveEntryResults(results);
     }
 };
 
@@ -34,13 +44,13 @@ browser.runtime.onInstalled.addListener((details) => {
 
     browser.contextMenus.create({
         contexts: ['selection'],
-        id: ENTRY_LOOKUP_RESULTS_KEY,
-        title: 'Query Entries',
+        id: QUERY_LOOKUP_RESULTS_KEY,
+        title: 'Query Selected Text',
     });
 });
 
 browser.contextMenus.onClicked.addListener((info) => {
-    if (info.menuItemId === ENTRY_LOOKUP_RESULTS_KEY) {
+    if (info.menuItemId === QUERY_LOOKUP_RESULTS_KEY) {
         performTextLookup(info.selectionText);
     }
 });

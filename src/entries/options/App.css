@@ -1,0 +1,115 @@
+/* Global reset and layout settings */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Ensuring body takes the full width and height */
+body {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Take up full viewport height */
+    min-width: 100vw; /* Ensure body takes up full viewport width */
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Prevent scrolling */
+}
+
+/* Ensure the "app" div stretches the full width */
+#app {
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+}
+
+/* Main container centered with full width available */
+main {
+    width: 90%; /* Allow flexibility with width */
+    max-width: 800px; /* Limit max width if needed */
+    text-align: left;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: auto; /* In case of long content */
+}
+
+/* Header styling */
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+/* Form container to stack form fields */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Styling individual form fields */
+.form-field {
+    display: flex;
+    flex-direction: column; /* Stack label and input vertically */
+    gap: 8px; /* Space between label and input */
+}
+
+/* Label styling */
+label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #7f8c8d;
+}
+
+/* Input and button row container */
+.input-button-row {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between input and button */
+}
+
+/* Styling for the input fields */
+input {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    flex: 1; /* Make the input take the available space */
+    outline: none;
+}
+
+/* Focused input styling */
+input:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+/* Button styling */
+button {
+    padding: 10px 15px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+    min-width: 80px; /* Ensure the button has a minimum width */
+}
+
+/* Button hover state */
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Disabled button state */
+button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}

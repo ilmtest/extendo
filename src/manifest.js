@@ -13,7 +13,7 @@ const manifest = {
     background: {
         service_worker: 'src/entries/background/main.js',
     },
-    host_permissions: ['https://ilmtest.net/*', 'http://localhost:8080/*'],
+    host_permissions: ['<all_urls>'],
     icons: {
         16: 'icons/16.png',
         19: 'icons/19.png',
@@ -25,6 +25,10 @@ const manifest = {
         128: 'icons/128.png',
         256: 'icons/256.png',
         512: 'icons/512.png',
+    },
+    options_ui: {
+        open_in_tab: true,
+        page: 'src/entries/options/index.html',
     },
     permissions: ['contextMenus', 'storage', 'tabs'],
 };
