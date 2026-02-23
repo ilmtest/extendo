@@ -23,15 +23,23 @@ mock.module('wxt/browser', () => ({
     browser: browserMock,
 }));
 
-(global as any).browser = browserMock;
-(global as any).chrome = {
+const testGlobal = globalThis as typeof globalThis & {
+    browser: typeof browserMock;
+    chrome: {
+        runtime: {
+            getURL: (path: string) => string;
+        };
+    };
+};
+testGlobal.browser = browserMock;
+testGlobal.chrome = {
     runtime: {
         getURL: browserMock.runtime.getURL,
     },
 };
 
 // Mock logger globally to prevent storage writes during tests
-mock.module('@/utils/logger', () => ({
+mock.module('@/src/utils/logger', () => ({
     logger: {
         debug: () => {},
         error: () => {},
