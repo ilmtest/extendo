@@ -48,12 +48,19 @@ It also includes content-script support for clipboard shortcut actions and a bac
 
 ## Project Structure
 
-- `entrypoints/background.ts` - MV3 service worker orchestration and listeners.
-- `entrypoints/popup/*` - popup UI and URL query flow.
-- `entrypoints/options/*` - extension options page.
-- `entrypoints/content.ts` - content-script message handler and clipboard + toast behavior.
+- `entrypoints/background.ts` - thin WXT bootstrap that re-exports background app entry from `src`.
+- `entrypoints/content.ts` - thin WXT bootstrap that re-exports content app entry from `src`.
+- `entrypoints/popup/*` - popup HTML + React mount entry.
+- `entrypoints/options/*` - options HTML + React mount entry.
 - `src/api/index.ts` - network request helper.
-- `src/background/*` - background constants, types, pure utility functions, and tests.
+- `src/background/entrypoint.ts` - background service-worker orchestration and listener wiring.
+- `src/background/blackiya/*` - Blackiya connection, event processing, payload quality gates, persistence, and handler modules.
+- `src/background/*` - background constants, types, sync manager/helpers, pure utility functions, and tests.
+- `src/content/entrypoint.ts` - content-script shortcut, copy/paste, and toast workflow.
+- `src/background/blackiya-sync-manager.ts` - alarm/heartbeat-driven Blackiya sync coordinator that hydrates persisted dedupe state, keeps a single connection in flight, and runs pull reconciles on wakes/disconnects.
+- `src/background/blackiya-sync-helpers.ts` - helper utilities for payload hashing, persisted dedupe, and in-flight reservation along with their tests.
+- `src/popup/App.tsx` - popup UI and URL query flow.
+- `src/options/App.tsx` - options UI and settings/log controls.
 - `src/components/ui/button.tsx` - shared shadcn button primitive.
 - `src/utils/*` - shared utilities (storage, logger, helpers).
 - `assets/tailwind.css` - Tailwind theme tokens and base styles.
@@ -83,3 +90,4 @@ It also includes content-script support for clipboard shortcut actions and a bac
 - This project uses Bun for all package and script operations.
 - If you add new public assets used by content scripts via `browser.runtime.getURL(...)`, regenerate WXT types with:
   - `bun install` (runs `wxt prepare`)
+- Updates to `Blackiya` sync should include `bun test src/background/{utils,blackiya-sync-helpers,blackiya-sync-manager}.test.ts` so the new manager behavior stays covered.

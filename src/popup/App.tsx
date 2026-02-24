@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { browser } from 'wxt/browser';
 import { doGetRequest } from '@/src/api';
 import { Button } from '@/src/components/ui/button';
-import { sanitizeURL } from '@/src/utils/helpers';
 import { getIlmTestApiInstance, popEntryResults } from '@/src/utils/db';
+import { sanitizeURL } from '@/src/utils/helpers';
 import { logError } from '@/src/utils/logger';
 
 const App = () => {
