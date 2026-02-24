@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/ilmtest/extendo/compare/v1.0.0...v1.1.0) (2026-02-24)
+
+
+### Features
+
+* **logs:** Fix long running sessions being dropped ([#5](https://github.com/ilmtest/extendo/issues/5)) ([7a412d8](https://github.com/ilmtest/extendo/commit/7a412d8500734c3466d73e1487023edcb6cc90de))
+
 # 1.0.0 (2026-02-23)
 
 
