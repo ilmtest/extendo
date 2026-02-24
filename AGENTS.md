@@ -30,21 +30,14 @@ Extendo is a WXT + React + TypeScript browser extension (MV3) with:
 
 ## Architecture Snapshot
 
-- `entrypoints/background.ts`
-  - Context-menu registration.
-  - Selected-text endpoint lookup.
-  - Badge state updates.
-- `entrypoints/popup/App.tsx`
-  - URL query workflow and result rendering.
-- `entrypoints/options/App.tsx`
-  - Endpoint config UI with placeholder validation.
-- `entrypoints/content.ts`
-  - Supported-site floating action button.
-  - Page-context bridge trigger.
-- `utils/db.ts`
-  - `browser.storage.local` wrappers and key management.
-- `api/index.ts`
-  - Shared GET request utility.
+- `entrypoints/background.ts` - loads the Blackiya sync manager, hooks alarms/startup/installed listeners, and forwards clipboard/popup plumbing.
+- `entrypoints/popup/App.tsx` - URL query workflow and result rendering.
+- `entrypoints/options/App.tsx` - endpoint configuration UI with placeholder validation.
+- `entrypoints/content.ts` - clipboard shortcut handler + Sonner toast integration.
+- `src/background/blackiya-sync-manager.ts` - single-flight connect/reconcile coordinator that schedules `BLACKIYA_SYNC_HEARTBEAT` alarms, hydrates persisted dedupe state, and runs pulls on every wake.
+- `src/background/blackiya-sync-helpers.ts` - payload hash and in-flight reservation helpers shared by the manager and event processor.
+- `src/utils/db.ts` - `browser.storage.local` wrappers, including saved conversation hash persistence.
+- `api/index.ts` - shared GET request helper.
 
 ## Known Lessons Learned (Important)
 
@@ -75,9 +68,10 @@ Extendo is a WXT + React + TypeScript browser extension (MV3) with:
 
 After changing extension logic:
 1. `bun run compile`
-2. Reload extension in `chrome://extensions`
-3. Hard refresh affected pages/tabs
-4. Re-check popup/options/content-script behavior manually
+2. Verify `BLACKIYA_SYNC_HEARTBEAT` alarm is scheduled (check `browser.alarms.getAll`/logs) after loading the background worker so reconciliation kicks off
+3. Reload extension in `chrome://extensions`
+4. Hard refresh affected pages/tabs
+5. Re-check popup/options/content-script behavior manually
 
 ## Git Notes
 

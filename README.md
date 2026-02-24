@@ -54,6 +54,8 @@ It also includes content-script support for clipboard shortcut actions and a bac
 - `entrypoints/content.ts` - content-script message handler and clipboard + toast behavior.
 - `src/api/index.ts` - network request helper.
 - `src/background/*` - background constants, types, pure utility functions, and tests.
+- `src/background/blackiya-sync-manager.ts` - alarm/heartbeat-driven Blackiya sync coordinator that hydrates persisted dedupe state, keeps a single connection in flight, and runs pull reconciles on wakes/disconnects.
+- `src/background/blackiya-sync-helpers.ts` - helper utilities for payload hashing, persisted dedupe, and in-flight reservation along with their tests.
 - `src/components/ui/button.tsx` - shared shadcn button primitive.
 - `src/utils/*` - shared utilities (storage, logger, helpers).
 - `assets/tailwind.css` - Tailwind theme tokens and base styles.
@@ -83,3 +85,4 @@ It also includes content-script support for clipboard shortcut actions and a bac
 - This project uses Bun for all package and script operations.
 - If you add new public assets used by content scripts via `browser.runtime.getURL(...)`, regenerate WXT types with:
   - `bun install` (runs `wxt prepare`)
+- Updates to `Blackiya` sync should include `bun test src/background/{utils,blackiya-sync-helpers,blackiya-sync-manager}.test.ts` so the new manager behavior stays covered.

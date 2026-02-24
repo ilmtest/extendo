@@ -10,7 +10,7 @@ export default defineConfig({
         host_permissions: ['<all_urls>'],
         description,
         name: name.charAt(0).toUpperCase() + name.slice(1),
-        permissions: ['contextMenus', 'storage', 'tabs'],
+        permissions: ['alarms', 'contextMenus', 'storage', 'tabs'],
     },
     vite: () => ({
         plugins: [tailwindcss()],
