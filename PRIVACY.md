@@ -21,6 +21,15 @@ Extendo is a browser extension that helps you query your configured APIs and cop
 - Compilation excerpt requests are sent to your configured Translations API instance.
 - Settings are stored locally in `browser.storage.local`.
 
+## Why We Request the `alarms` Permission
+
+Extendo uses the `alarms` permission to schedule a lightweight periodic wake-up for the background service worker so Blackiya sync stays reliable.
+
+- It is used to re-check and re-establish the Blackiya event connection after browser sleep, service-worker suspension, or temporary disconnects.
+- It is also used to run a reconcile check (`conversation.getLatest`) so missed events can be recovered.
+- The alarm does not read page content, does not monitor browsing activity, and does not collect additional personal data by itself.
+- The permission is used only for extension-internal scheduling and reliability of features you enable.
+
 ## Data Sharing
 
 Extendo does not sell data and does not send data to any vendor-owned backend by default.
