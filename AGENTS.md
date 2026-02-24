@@ -30,14 +30,17 @@ Extendo is a WXT + React + TypeScript browser extension (MV3) with:
 
 ## Architecture Snapshot
 
-- `entrypoints/background.ts` - loads the Blackiya sync manager, hooks alarms/startup/installed listeners, and forwards clipboard/popup plumbing.
-- `entrypoints/popup/App.tsx` - URL query workflow and result rendering.
-- `entrypoints/options/App.tsx` - endpoint configuration UI with placeholder validation.
-- `entrypoints/content.ts` - clipboard shortcut handler + Sonner toast integration.
+- `entrypoints/background.ts` - thin bootstrap that re-exports `src/background/entrypoint.ts`.
+- `entrypoints/content.ts` - thin bootstrap that re-exports `src/content/entrypoint.ts`.
+- `entrypoints/popup/main.tsx` - popup mount entry; UI lives in `src/popup/App.tsx`.
+- `entrypoints/options/main.tsx` - options mount entry; UI lives in `src/options/App.tsx`.
+- `src/background/entrypoint.ts` - hooks alarms/startup/installed listeners and wires Blackiya sync + runtime handlers.
+- `src/background/blackiya/*` - Blackiya connection, event processing, payload quality, and persistence modules.
+- `src/content/entrypoint.ts` - clipboard shortcut handler + Sonner toast integration.
 - `src/background/blackiya-sync-manager.ts` - single-flight connect/reconcile coordinator that schedules `BLACKIYA_SYNC_HEARTBEAT` alarms, hydrates persisted dedupe state, and runs pulls on every wake.
 - `src/background/blackiya-sync-helpers.ts` - payload hash and in-flight reservation helpers shared by the manager and event processor.
 - `src/utils/db.ts` - `browser.storage.local` wrappers, including saved conversation hash persistence.
-- `api/index.ts` - shared GET request helper.
+- `src/api/index.ts` - shared GET request helper.
 
 ## Known Lessons Learned (Important)
 
