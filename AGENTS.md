@@ -34,18 +34,16 @@ Extendo is a WXT + React + TypeScript browser extension (MV3) with:
 - `entrypoints/content.ts` - thin bootstrap that re-exports `src/content/entrypoint.ts`.
 - `entrypoints/popup/main.tsx` - popup mount entry; UI lives in `src/popup/App.tsx`.
 - `entrypoints/options/main.tsx` - options mount entry; UI lives in `src/options/App.tsx`.
-- `src/background/entrypoint.ts` - hooks alarms/startup/installed listeners and wires Blackiya sync + runtime handlers.
-- `src/background/blackiya/*` - Blackiya connection, event processing, payload quality, and persistence modules.
+- `src/background/entrypoint.ts` - wires runtime handlers (context menu + runtime messages).
+- `src/background/handlers.ts` - background handlers for context menu and runtime requests.
 - `src/content/entrypoint.ts` - clipboard shortcut handler + Sonner toast integration.
-- `src/background/blackiya-sync-manager.ts` - single-flight connect/reconcile coordinator that schedules `BLACKIYA_SYNC_HEARTBEAT` alarms, hydrates persisted dedupe state, and runs pulls on every wake.
-- `src/background/blackiya-sync-helpers.ts` - payload hash and in-flight reservation helpers shared by the manager and event processor.
-- `src/utils/db.ts` - `browser.storage.local` wrappers, including saved conversation hash persistence.
+- `src/utils/db.ts` - `browser.storage.local` wrappers for configured API instances and local state.
 - `src/api/index.ts` - shared GET request helper.
 
 ## Known Lessons Learned (Important)
 
 1. Content scripts run in an isolated world.
-- Page globals like `window.__blackiya` are not directly callable from content-script scope.
+- Page globals are not directly callable from content-script scope.
 - To access page globals, inject a page-context script file (not inline text on strict CSP sites).
 
 2. CSP blocks inline injected scripts on ChatGPT/Gemini and similar apps.
@@ -71,10 +69,9 @@ Extendo is a WXT + React + TypeScript browser extension (MV3) with:
 
 After changing extension logic:
 1. `bun run compile`
-2. Verify `BLACKIYA_SYNC_HEARTBEAT` alarm is scheduled (check `browser.alarms.getAll`/logs) after loading the background worker so reconciliation kicks off
-3. Reload extension in `chrome://extensions`
-4. Hard refresh affected pages/tabs
-5. Re-check popup/options/content-script behavior manually
+2. Reload extension in `chrome://extensions`
+3. Hard refresh affected pages/tabs
+4. Re-check popup/options/content-script behavior manually
 
 ## Git Notes
 

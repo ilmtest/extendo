@@ -2,9 +2,6 @@
 ![Extendo Icon](./icon.png)
 
 [![wakatime](https://wakatime.com/badge/user/a0b906ce-b8e7-4463-8bce-383238df6d4b/project/f693f5c9-8f42-47a2-83aa-7a5052cbec22.svg)](https://wakatime.com/badge/user/a0b906ce-b8e7-4463-8bce-383238df6d4b/project/f693f5c9-8f42-47a2-83aa-7a5052cbec22)
-[![codecov](https://codecov.io/gh/ragaeeb/blackiya/graph/badge.svg?token=M52GQARSGD)](https://codecov.io/gh/ragaeeb/blackiya)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/ragaeeb/blackiya/ci.yml?branch=main)](https://github.com/ragaeeb/blackiya/actions)
-[![Version](https://img.shields.io/github/v/release/ragaeeb/blackiya)](https://github.com/ragaeeb/blackiya/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Bun](https://img.shields.io/badge/Bun-%23000000.svg?style=flat&logo=bun&logoColor=white)](https://bun.sh)
 [![Biome](https://img.shields.io/badge/Biome-%2360a5fa.svg?style=flat&logo=biome&logoColor=white)](https://biomejs.dev)
@@ -17,7 +14,7 @@ The extension provides a lightweight workflow for querying configured endpoints 
 - a context-menu action (query selected text)
 - an options page (configure API instances)
 
-It also includes content-script support for clipboard shortcut actions and a background listener for Blackiya events.
+It also includes content-script support for clipboard shortcut actions.
 
 ## Tech Stack
 
@@ -54,11 +51,8 @@ It also includes content-script support for clipboard shortcut actions and a bac
 - `entrypoints/options/*` - options HTML + React mount entry.
 - `src/api/index.ts` - network request helper.
 - `src/background/entrypoint.ts` - background service-worker orchestration and listener wiring.
-- `src/background/blackiya/*` - Blackiya connection, event processing, payload quality gates, persistence, and handler modules.
-- `src/background/*` - background constants, types, sync manager/helpers, pure utility functions, and tests.
+- `src/background/*` - background constants, types, pure utility functions, and tests.
 - `src/content/entrypoint.ts` - content-script shortcut, copy/paste, and toast workflow.
-- `src/background/blackiya-sync-manager.ts` - alarm/heartbeat-driven Blackiya sync coordinator that hydrates persisted dedupe state, keeps a single connection in flight, and runs pull reconciles on wakes/disconnects.
-- `src/background/blackiya-sync-helpers.ts` - helper utilities for payload hashing, persisted dedupe, and in-flight reservation along with their tests.
 - `src/popup/App.tsx` - popup UI and URL query flow.
 - `src/options/App.tsx` - options UI and settings/log controls.
 - `src/components/ui/button.tsx` - shared shadcn button primitive.
@@ -83,11 +77,9 @@ It also includes content-script support for clipboard shortcut actions and a bac
 4. Open options and configure:
    - IlmTest API Instance
    - Translations API Instance
-   - Blackiya Extension ID
 
 ## Notes
 
 - This project uses Bun for all package and script operations.
 - If you add new public assets used by content scripts via `browser.runtime.getURL(...)`, regenerate WXT types with:
   - `bun install` (runs `wxt prepare`)
-- Updates to `Blackiya` sync should include `bun test src/background/{utils,blackiya-sync-helpers,blackiya-sync-manager}.test.ts` so the new manager behavior stays covered.

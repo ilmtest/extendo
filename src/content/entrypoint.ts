@@ -6,6 +6,11 @@ import 'sonner/dist/styles.css';
 import { browser } from 'wxt/browser';
 import type { CompilationFetchRequest, CompilationFetchResponse, LLMProvider, TokenVariant } from '@/src/background/types';
 import { getMaxTokensForVariant, getProviderFromUrl } from '@/src/background/utils';
+import {
+    createDeliveryStatusOverlay,
+    isExtendoDeliveryStatusMessage,
+    shouldDisplayDeliveryStatusForUrl,
+} from '@/src/content/delivery-status-overlay';
 import { injectTextViaPaste, resolveEditableTarget } from '@/src/content/paste-target';
 
 const SONNER_ROOT_ID = 'extendo-sonner-root';
@@ -165,6 +170,11 @@ const isCompilationFetchResponse = (value: unknown): value is CompilationFetchRe
 };
 
 const runCopyAction = async (provider: LLMProvider, maxTokens: number, pasteTarget: HTMLElement | null) => {
+    ensureToaster();
+    const loadingToastId = toast.loading(`Loading ${maxTokens.toLocaleString()} tokens...`, {
+        duration: Infinity,
+    });
+
     try {
         const request = {
             type: 'fetch-compilation-excerpt',
@@ -183,15 +193,18 @@ const runCopyAction = async (provider: LLMProvider, maxTokens: number, pasteTarg
 
         const content = response.text;
         if (pasteTarget && injectTextViaPaste(pasteTarget, content)) {
+            toast.dismiss(loadingToastId);
             showToast(`Pasted ${maxTokens.toLocaleString()} tokens`);
             console.info('Extendo: excerpt pasted into editable target');
             return;
         }
 
         await copyTextToClipboard(content);
+        toast.dismiss(loadingToastId);
         showToast(`Copied ${maxTokens.toLocaleString()} tokens to clipboard`);
         console.info('Extendo: excerpt copied to clipboard');
     } catch (error) {
+        toast.dismiss(loadingToastId);
         showToast('Copy failed', 'error');
         console.error('Failed to copy excerpt', error);
     }
@@ -207,6 +220,9 @@ export default defineContentScript({
         listenersAttached = true;
 
         ensureToaster();
+        const deliveryStatusOverlay = createDeliveryStatusOverlay({
+            iconUrl: browser.runtime.getURL('/icon/32.png'),
+        });
 
         const handleKeyDown = (event: KeyboardEvent) => {
             setModifierPressed(event.code, true);
@@ -238,5 +254,15 @@ export default defineContentScript({
         window.addEventListener('keydown', handleKeyDown, true);
         window.addEventListener('keyup', handleKeyUp, true);
         window.addEventListener('blur', handleBlur, true);
+
+        browser.runtime.onMessage.addListener((message) => {
+            if (!isExtendoDeliveryStatusMessage(message)) {
+                return;
+            }
+            if (!shouldDisplayDeliveryStatusForUrl(message, window.location.href)) {
+                return;
+            }
+            deliveryStatusOverlay.show(message);
+        });
     },
 });

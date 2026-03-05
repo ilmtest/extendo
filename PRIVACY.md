@@ -8,27 +8,15 @@ Extendo is a browser extension that helps you query your configured APIs and cop
 
 - Active tab URL (when you use URL lookup in the popup)
 - Selected text (when you use the context-menu text query)
-- Conversation payload events from Blackiya (when configured and available)
 - Settings you enter in the options page:
   - IlmTest API instance URL
   - Translations API instance URL
-  - Blackiya extension ID
 
 ## How Data Is Used
 
 - URL and selected text are sent to your configured IlmTest API instance for lookup.
-- Blackiya conversation payloads are forwarded to your configured Translations API instance.
 - Compilation excerpt requests are sent to your configured Translations API instance.
 - Settings are stored locally in `browser.storage.local`.
-
-## Why We Request the `alarms` Permission
-
-Extendo uses the `alarms` permission to schedule a lightweight periodic wake-up for the background service worker so Blackiya sync stays reliable.
-
-- It is used to re-check and re-establish the Blackiya event connection after browser sleep, service-worker suspension, or temporary disconnects.
-- It is also used to run a reconcile check (`conversation.getLatest`) so missed events can be recovered.
-- The alarm does not read page content, does not monitor browsing activity, and does not collect additional personal data by itself.
-- The permission is used only for extension-internal scheduling and reliability of features you enable.
 
 ## Data Sharing
 
@@ -47,7 +35,7 @@ Data transmission security depends on the endpoint URLs you configure. Use HTTPS
 
 ## Your Controls
 
-- Update or remove configured endpoints and IDs from the options page at any time.
+- Update or remove configured endpoints from the options page at any time.
 - Remove the extension to stop all processing.
 - Clear extension storage via browser extension settings to remove locally stored data.
 

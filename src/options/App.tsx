@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
+import { Toaster, toast } from 'sonner';
+import 'sonner/dist/styles.css';
 
 import { Button } from '@/src/components/ui/button';
 import {
-    getBlackiyaExtensionId,
     getIlmTestApiInstance,
     getTranslationsApiInstance,
-    saveBlackiyaExtensionId,
     saveIlmTestApiInstance,
     saveTranslationsApiInstance,
 } from '@/src/utils/db';
 import { clearLogEntries, getLogEntries } from '@/src/utils/logger';
 
-const BLACKIYA_EXTENSION_ID_PATTERN = /^[a-p]{32}$/;
 const SENSITIVE_QUERY_KEY_PATTERN = /(token|key|secret|password|auth|credential)/i;
 
 const getPreviewInstance = (value: string) => {
@@ -42,7 +41,6 @@ const getPreviewInstance = (value: string) => {
 const App = () => {
     const [ilmTestApiInstance, setIlmTestApiInstance] = useState('');
     const [translationsApiInstance, setTranslationsApiInstance] = useState('');
-    const [blackiyaExtensionId, setBlackiyaExtensionId] = useState('');
     const [status, setStatus] = useState('');
     const [exportStatus, setExportStatus] = useState('');
     const [clearStatus, setClearStatus] = useState('');
@@ -52,7 +50,6 @@ const App = () => {
     useEffect(() => {
         getIlmTestApiInstance().then(setIlmTestApiInstance);
         getTranslationsApiInstance().then(setTranslationsApiInstance);
-        getBlackiyaExtensionId().then(setBlackiyaExtensionId);
     }, []);
 
     const saveSettings = async () => {
@@ -66,29 +63,27 @@ const App = () => {
             return;
         }
 
-        if (!blackiyaExtensionId.trim()) {
-            setStatus('Blackiya extension ID is required');
-            return;
-        }
-
-        if (!BLACKIYA_EXTENSION_ID_PATTERN.test(blackiyaExtensionId.trim())) {
-            setStatus('Blackiya extension ID must be 32 lowercase characters (a-p)');
-            return;
-        }
-
         await saveIlmTestApiInstance(ilmTestApiInstance);
         await saveTranslationsApiInstance(translationsApiInstance);
-        await saveBlackiyaExtensionId(blackiyaExtensionId);
-        setStatus('Settings saved');
+        setStatus('');
+        toast.success('Settings saved');
     };
 
     return (
         <main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col gap-8 p-8">
+            <Toaster
+                position="top-right"
+                richColors
+                toastOptions={{
+                    style: {
+                        zIndex: 2147483647,
+                    },
+                }}
+            />
             <header className="space-y-2">
                 <h1 className="text-2xl font-semibold">Extendo Settings</h1>
                 <p className="text-sm text-muted-foreground">
-                    Configure API instances and Blackiya extension integration used by URL/content queries, translation
-                    POST, and compilation copy.
+                    Configure API instances used by URL/content queries, translation POST, and compilation copy.
                 </p>
             </header>
 
@@ -110,28 +105,6 @@ const App = () => {
                 <p className="text-xs text-muted-foreground">
                     Content lookup: {ilmTestPreviewInstance}/entries.php?query={'{'}
                     string_array{'}'}
-                </p>
-            </section>
-
-            <section className="space-y-3 rounded-lg border bg-card p-4">
-                <label className="text-sm font-medium" htmlFor="blackiya-extension-id">
-                    Blackiya Extension ID
-                </label>
-                <input
-                    className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none ring-ring/50 focus-visible:ring-[3px]"
-                    autoCapitalize="off"
-                    autoCorrect="off"
-                    id="blackiya-extension-id"
-                    maxLength={32}
-                    minLength={32}
-                    onChange={(event) => setBlackiyaExtensionId(event.target.value)}
-                    placeholder="abcdefghijklmnopabcdefghijklmnop"
-                    spellCheck={false}
-                    type="text"
-                    value={blackiyaExtensionId}
-                />
-                <p className="text-xs text-muted-foreground">
-                    Used by the content script to connect to the Blackiya External API.
                 </p>
             </section>
 

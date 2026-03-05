@@ -40,6 +40,11 @@ testGlobal.chrome = {
 
 // Mock logger globally to prevent storage writes during tests
 mock.module('@/src/utils/logger', () => ({
+    debug: () => {},
+    log: () => {},
+    logError: () => {},
+    getLogEntries: async () => [],
+    clearLogEntries: async () => {},
     logger: {
         debug: () => {},
         error: () => {},

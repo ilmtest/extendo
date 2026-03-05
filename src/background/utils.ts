@@ -1,17 +1,11 @@
 import {
-    BLACKIYA_API_VERSION,
     COMPILATION_API_PATH,
     GEMINI_HOSTS,
     GROK_HOSTS,
     MAX_TOKENS_BY_VARIANT,
     OPENAI_HOSTS,
 } from '@/src/background/constants';
-import type {
-    BlackiyaConversationEvent,
-    BlackiyaGetLatestSuccessResponse,
-    LLMProvider,
-    TokenVariant,
-} from '@/src/background/types';
+import type { LLMProvider, TokenVariant } from '@/src/background/types';
 
 const hostnameMatchesAny = (hostname: string, hosts: readonly string[]) =>
     hosts.some((host) => hostname === host || hostname.endsWith(`.${host}`));
@@ -50,37 +44,4 @@ export const buildCompilationEndpoint = (translationsApiInstance: string, provid
         maxTokens: maxTokens.toString(),
     });
     return `${translationsApiInstance}${COMPILATION_API_PATH}?${query.toString()}`;
-};
-
-export const isBlackiyaConversationEvent = (value: unknown): value is BlackiyaConversationEvent => {
-    if (typeof value !== 'object' || value === null) {
-        return false;
-    }
-
-    const data = value as Record<string, unknown>;
-    return (
-        data.api === BLACKIYA_API_VERSION &&
-        (data.type === 'conversation.ready' || data.type === 'conversation.updated') &&
-        typeof data.event_id === 'string' &&
-        typeof data.conversation_id === 'string' &&
-        typeof data.payload === 'object' &&
-        data.payload !== null
-    );
-};
-
-export const isBlackiyaGetLatestSuccessResponse = (value: unknown): value is BlackiyaGetLatestSuccessResponse => {
-    if (typeof value !== 'object' || value === null) {
-        return false;
-    }
-
-    const data = value as Record<string, unknown>;
-    return (
-        data.ok === true &&
-        data.api === BLACKIYA_API_VERSION &&
-        data.format === 'original' &&
-        typeof data.ts === 'number' &&
-        typeof data.conversation_id === 'string' &&
-        typeof data.data === 'object' &&
-        data.data !== null
-    );
 };

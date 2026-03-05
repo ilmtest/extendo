@@ -130,5 +130,5 @@ export const handleRuntimeMessage = (
         } satisfies CompilationFetchResponse);
     });
 
-    return true; // signal async response to browser runtime
+    return true;
 };
