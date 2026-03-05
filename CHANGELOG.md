@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/ilmtest/extendo/compare/v1.1.0...v1.2.0) (2026-03-05)
+
+
+### Features
+
+* **toast:** Add toasts ([290722d](https://github.com/ilmtest/extendo/commit/290722d276b44cb936e52620512897364b722677))
+
 # [1.1.0](https://github.com/ilmtest/extendo/compare/v1.0.0...v1.1.0) (2026-02-24)
 
 
