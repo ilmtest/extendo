@@ -61,10 +61,10 @@ It also includes content-script support for clipboard shortcut actions.
 
 ## Scripts
 
-- `bun run dev` - run WXT dev server
+- `bun run dev` - run WXT dev server (animal build names enabled)
 - `bun run dev:firefox` - run WXT dev server for Firefox
 - `bun run compile` - TypeScript check (`tsc --noEmit`)
-- `bun run build` - production build
+- `bun run build` - production build (stable extension name: `Extendo`)
 - `bun run zip` - package extension zip
 
 ## Local Development
@@ -83,3 +83,6 @@ It also includes content-script support for clipboard shortcut actions.
 - This project uses Bun for all package and script operations.
 - If you add new public assets used by content scripts via `browser.runtime.getURL(...)`, regenerate WXT types with:
   - `bun install` (runs `wxt prepare`)
+- Build naming behavior:
+  - `bun run dev` uses per-build animal codenames in the extension display name.
+  - `bun run build` uses the stable production display name (`Extendo`).

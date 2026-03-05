@@ -46,11 +46,13 @@ const resolveCommitShortSha = () => {
 
 const BUILD_COMMIT_SHA = resolveCommitShortSha();
 const BUILD_ID = `${BUILD_COMMIT_SHA}-${Date.now().toString(36)}`;
+const BUILD_PROFILE = process.env.EXTENDO_BUILD_PROFILE === 'dev' ? 'dev' : 'prod';
+const IS_DEV_BUILD = BUILD_PROFILE === 'dev';
 const codenameIndex =
     BUILD_ID.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0) % ALLITERATION_CODENAMES.length;
 const BUILD_CODENAME = ALLITERATION_CODENAMES[codenameIndex] ?? 'Mellow Marmot';
 const BASE_NAME = name.charAt(0).toUpperCase() + name.slice(1);
-const MANIFEST_NAME = `${BASE_NAME} [${BUILD_CODENAME} ${BUILD_COMMIT_SHA}]`;
+const MANIFEST_NAME = IS_DEV_BUILD ? `${BASE_NAME} [${BUILD_CODENAME} ${BUILD_COMMIT_SHA}]` : BASE_NAME;
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
