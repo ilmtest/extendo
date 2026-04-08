@@ -2,7 +2,7 @@
 	"name": "extendo",
 	"description": "Local translation management",
 	"private": true,
-	"version": "1.3.0",
+	"version": "1.3.1",
 	"type": "module",
 	"scripts": {
 		"dev": "EXTENDO_BUILD_PROFILE=dev wxt",

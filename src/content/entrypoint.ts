@@ -12,7 +12,7 @@ import {
     isExtendoDeliveryStatusMessage,
     shouldDisplayDeliveryStatusForUrl,
 } from '@/src/content/delivery-status-overlay';
-import { injectTextViaPasteAndReveal, resolveEditableTarget } from '@/src/content/paste-target';
+import { injectTextViaPaste, injectTextViaPasteAndReveal, resolveEditableTarget } from '@/src/content/paste-target';
 
 const SONNER_ROOT_ID = 'extendo-sonner-root';
 const CLIPBOARD_FOCUS_DELAY_MS = 120;
@@ -25,7 +25,7 @@ const activeModifierCodes = new Set<ModifierCode>();
 type Side = 'left' | 'right' | null;
 type ModifierCode = (typeof MODIFIER_CODES)[number];
 
-const isOpenAIHost = (hostname: string) => OPENAI_HOSTS.some((host) => hostname === host || hostname.endsWith(`.${host}`));
+const isOpenAIHost = (hostname: string) => OPENAI_HOSTS.includes(hostname as (typeof OPENAI_HOSTS)[number]);
 
 const wait = async (ms: number) =>
     new Promise<void>((resolve) => {
@@ -195,11 +195,17 @@ const runCopyAction = async (provider: LLMProvider, maxTokens: number, pasteTarg
         }
 
         const content = response.text;
-        if (pasteTarget && (!isOpenAIHost(window.location.hostname) || (await injectTextViaPasteAndReveal(pasteTarget, content)))) {
-            toast.dismiss(loadingToastId);
-            showToast(`Pasted ${maxTokens.toLocaleString()} tokens`);
-            console.info('Extendo: excerpt pasted into editable target');
-            return;
+        if (pasteTarget) {
+            const pasted = isOpenAIHost(window.location.hostname)
+                ? await injectTextViaPasteAndReveal(pasteTarget, content)
+                : injectTextViaPaste(pasteTarget, content);
+
+            if (pasted) {
+                toast.dismiss(loadingToastId);
+                showToast(`Pasted ${maxTokens.toLocaleString()} tokens`);
+                console.info('Extendo: excerpt pasted into editable target');
+                return;
+            }
         }
 
         await copyTextToClipboard(content);
