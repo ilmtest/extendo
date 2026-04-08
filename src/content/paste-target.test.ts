@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'bun:test';
-import { injectTextViaPaste, resolveEditableTarget } from '@/src/content/paste-target';
+import {
+    injectTextViaPaste,
+    injectTextViaPasteAndReveal,
+    clickShowInTextFieldButton,
+    resolveEditableTarget,
+} from '@/src/content/paste-target';
 
 describe('content/paste-target', () => {
     it('should resolve textarea as editable target', () => {
@@ -50,5 +55,35 @@ describe('content/paste-target', () => {
         const result = injectTextViaPaste(div, 'ignored');
         expect(result).toBeTrue();
         expect(div.textContent).toBe('handled');
+    });
+
+    it('should click the show in text field button when present', async () => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.setAttribute('aria-label', 'Show in text field');
+        button.setAttribute('name', 'expand-file-tile');
+        document.body.appendChild(button);
+
+        let clicked = false;
+        button.addEventListener('click', () => {
+            clicked = true;
+        });
+
+        const result = await clickShowInTextFieldButton();
+
+        expect(result).toBeTrue();
+        expect(clicked).toBeTrue();
+    });
+
+    it('should paste and then reveal the text field when possible', async () => {
+        const textarea = document.createElement('textarea');
+        document.body.appendChild(textarea);
+        textarea.focus();
+
+        const longText = 'first section\n\nsecond section\n\nthird section';
+        const result = await injectTextViaPasteAndReveal(textarea, longText);
+
+        expect(result).toBeTrue();
+        expect(textarea.value).toBe(longText);
     });
 });

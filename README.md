@@ -14,7 +14,7 @@ The extension provides a lightweight workflow for querying configured endpoints 
 - a context-menu action (query selected text)
 - an options page (configure API instances)
 
-It also includes content-script support for clipboard shortcut actions.
+It also includes content-script support for clipboard shortcut actions and ChatGPT-aware paste handling.
 
 ## Tech Stack
 
@@ -35,11 +35,12 @@ It also includes content-script support for clipboard shortcut actions.
 - Options page for endpoint configuration
   - IlmTest API instance (used for `GET /entries.php?url=...` and `GET /entries.php?query=...`)
   - Translations API instance (used for translation `POST` and compilation excerpt `GET`)
-- Clipboard shortcuts (content script)
+- Clipboard shortcuts and paste handling (content script)
   - `Left Command + Left Option + 0` -> `maxTokens=10000`
   - `Right Command + Right Option + 0` -> `maxTokens=20000`
   - `Left Command + Left Option + 7` -> `maxTokens=7000`
   - `Right Command + Right Option + 5` -> `maxTokens=15000`
+  - On ChatGPT, long pastes trigger the `Show in text field` button when available so content stays in the text composer.
 - UI system
   - Tailwind + shadcn setup with project branding tokens in `assets/tailwind.css`.
 
@@ -52,7 +53,7 @@ It also includes content-script support for clipboard shortcut actions.
 - `src/api/index.ts` - network request helper.
 - `src/background/entrypoint.ts` - background service-worker orchestration and listener wiring.
 - `src/background/*` - background constants, types, pure utility functions, and tests.
-- `src/content/entrypoint.ts` - content-script shortcut, copy/paste, and toast workflow.
+- `src/content/entrypoint.ts` - content-script shortcut, copy/paste, ChatGPT reveal, and toast workflow.
 - `src/popup/App.tsx` - popup UI and URL query flow.
 - `src/options/App.tsx` - options UI and settings/log controls.
 - `src/components/ui/button.tsx` - shared shadcn button primitive.

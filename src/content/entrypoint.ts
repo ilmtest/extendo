@@ -5,13 +5,14 @@ import { Toaster, toast } from 'sonner';
 import 'sonner/dist/styles.css';
 import { browser } from 'wxt/browser';
 import type { CompilationFetchRequest, CompilationFetchResponse, LLMProvider, TokenVariant } from '@/src/background/types';
+import { OPENAI_HOSTS } from '@/src/background/constants';
 import { getMaxTokensForVariant, getProviderFromUrl } from '@/src/background/utils';
 import {
     createDeliveryStatusOverlay,
     isExtendoDeliveryStatusMessage,
     shouldDisplayDeliveryStatusForUrl,
 } from '@/src/content/delivery-status-overlay';
-import { injectTextViaPaste, resolveEditableTarget } from '@/src/content/paste-target';
+import { injectTextViaPasteAndReveal, resolveEditableTarget } from '@/src/content/paste-target';
 
 const SONNER_ROOT_ID = 'extendo-sonner-root';
 const CLIPBOARD_FOCUS_DELAY_MS = 120;
@@ -23,6 +24,8 @@ const activeModifierCodes = new Set<ModifierCode>();
 
 type Side = 'left' | 'right' | null;
 type ModifierCode = (typeof MODIFIER_CODES)[number];
+
+const isOpenAIHost = (hostname: string) => OPENAI_HOSTS.some((host) => hostname === host || hostname.endsWith(`.${host}`));
 
 const wait = async (ms: number) =>
     new Promise<void>((resolve) => {
@@ -192,7 +195,7 @@ const runCopyAction = async (provider: LLMProvider, maxTokens: number, pasteTarg
         }
 
         const content = response.text;
-        if (pasteTarget && injectTextViaPaste(pasteTarget, content)) {
+        if (pasteTarget && (!isOpenAIHost(window.location.hostname) || (await injectTextViaPasteAndReveal(pasteTarget, content)))) {
             toast.dismiss(loadingToastId);
             showToast(`Pasted ${maxTokens.toLocaleString()} tokens`);
             console.info('Extendo: excerpt pasted into editable target');

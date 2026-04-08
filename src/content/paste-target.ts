@@ -1,4 +1,7 @@
 const INPUT_TYPE_ALLOWLIST = new Set(['text', 'search', 'url', 'tel', 'email', 'password', 'number']);
+const CHATGPT_SHOW_IN_TEXT_FIELD_SELECTOR =
+    'button[aria-label="Show in text field"][name="expand-file-tile"], button[aria-label="Show in text field"]';
+const CHATGPT_SHOW_IN_TEXT_FIELD_TIMEOUT_MS = 1200;
 
 const CUSTOM_EDITABLE_SELECTOR = [
     '[contenteditable="true"]',
@@ -146,4 +149,37 @@ export const injectTextViaPaste = (target: HTMLElement, text: string) => {
     }
 
     return false;
+};
+
+const waitForNextTask = () =>
+    new Promise<void>((resolve) => {
+        window.setTimeout(resolve, 0);
+    });
+
+const findShowInTextFieldButton = () =>
+    document.querySelector<HTMLButtonElement>(CHATGPT_SHOW_IN_TEXT_FIELD_SELECTOR);
+
+export const clickShowInTextFieldButton = async () => {
+    const deadline = Date.now() + CHATGPT_SHOW_IN_TEXT_FIELD_TIMEOUT_MS;
+
+    while (Date.now() < deadline) {
+        const button = findShowInTextFieldButton();
+        if (button) {
+            button.click();
+            return true;
+        }
+
+        await waitForNextTask();
+    }
+
+    return false;
+};
+
+export const injectTextViaPasteAndReveal = async (target: HTMLElement, text: string) => {
+    if (!injectTextViaPaste(target, text)) {
+        return false;
+    }
+
+    await clickShowInTextFieldButton();
+    return true;
 };
