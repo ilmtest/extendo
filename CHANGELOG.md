@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/ilmtest/extendo/compare/v1.2.0...v1.3.0) (2026-04-08)
+
+
+### Features
+
+* **paste:** Implement chunked paste ([106e6d7](https://github.com/ilmtest/extendo/commit/106e6d77effc5b726ea68ad4ba3e5b13e45be5d7))
+
 # [1.2.0](https://github.com/ilmtest/extendo/compare/v1.1.0...v1.2.0) (2026-03-05)
 
 
