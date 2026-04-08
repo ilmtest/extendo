@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/ilmtest/extendo/compare/v1.3.0...v1.3.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* **gpt:** Fix logic bleeding into non-chatgpt pages ([2f48266](https://github.com/ilmtest/extendo/commit/2f48266658b1e836526c89dbd70cdd96671f749f))
+
 # [1.3.0](https://github.com/ilmtest/extendo/compare/v1.2.0...v1.3.0) (2026-04-08)
 
 
